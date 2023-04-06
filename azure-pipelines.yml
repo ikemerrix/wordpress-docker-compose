@@ -1,0 +1,40 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+trigger:
+- master
+
+parameters:
+  - name: resourceGroupName
+    type: string
+  - name: appServicePlanName
+    type: string 
+  - name: appServiceName
+    type: string 
+pool:
+  vmImage: ubuntu-latest
+
+steps:
+- script: echo Hello, world!
+  displayName: 'Run a one-line script'
+
+- script: |
+    echo Add other tasks to build, test, and deploy your project.
+    echo See https://aka.ms/yaml
+  displayName: 'Run a multi-line script'
+
+- task: AzureCLI@2
+  inputs:
+    azureSubscription: 'FV Cert 1(23759a32-8981-4ac4-85d0-29259820d0aa)'
+    scriptType: 'bash'
+    scriptLocation: 'inlineScript'
+    inlineScript: 'az group create --name ${{parameters.resourceGroupName}} --location "West US" &&
+    az appservice plan create --name ${{parameters.appServicePlanName}} --resource-group ${{parameters.resourceGroupName}} --sku S1 --is-linux' 
+- task: AzureCLI@2
+  inputs:
+    azureSubscription: 'FV Cert 1(23759a32-8981-4ac4-85d0-29259820d0aa)'
+    scriptType: 'bash'
+    scriptLocation: 'inlineScript'
+    inlineScript: 'az webapp create --resource-group ${{parameters.resourceGroupName}} --plan ${{parameters.appServicePlanName}} --name ${{parameters.appServiceName}} --multicontainer-config-type compose --multicontainer-config-file docker-compose.yml'
